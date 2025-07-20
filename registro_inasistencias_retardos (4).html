@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Registro de Inasistencias y Retardos ✨</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #fffafc;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      color: #d46a92;
+    }
+    .materia {
+      background-color: #fce1ec;
+      border-radius: 20px;
+      padding: 15px;
+      margin: 20px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .materia:nth-child(2) { background-color: #fde7d7; }
+    .materia:nth-child(3) { background-color: #e0f7fa; }
+    .materia:nth-child(4) { background-color: #e3e0ff; }
+    .materia:nth-child(5) { background-color: #d9fdd3; }
+    .materia:nth-child(6) { background-color: #fff0c1; }
+    .materia:nth-child(7) { background-color: #fcd6f7; }
+    h2 {
+      margin-top: 0;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    button {
+      background-color: #ffffffcc;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 5px 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    input, textarea {
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 5px;
+      width: 90%;
+      margin-top: 5px;
+    }
+    .contador {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🖍️🐛💗🌈 Registro de Inasistencias y Retardos 💗🌈🐛🖍️</h1>
+
+  <div id="contenedor"></div>
+
+  <script>
+    const materias = [
+      "Pedagogías situadas globalizadoras",
+      "Intervenciones didactico - pedagógica y trabajo docente",
+      "Didáctica del espacio, forma y medida en preescolar",
+      "Literatura infantil y prácticas de literacidad",
+      "Estrategias para la exploración del mundo natural y social",
+      "Sistemas aumentativos y alternativos de comunicación",
+      "Inglés"
+    ];
+
+    const contenedor = document.getElementById('contenedor');
+
+    materias.forEach((nombre, i) => {
+      const div = document.createElement('div');
+      div.className = 'materia';
+
+      const h2 = document.createElement('h2');
+      h2.innerText = nombre;
+      div.appendChild(h2);
+
+      const contador = document.createElement('p');
+      contador.className = 'contador';
+      contador.id = `contador-${i}`;
+      div.appendChild(contador);
+
+      const lista = document.createElement('ul');
+      lista.id = `lista-${i}`;
+      div.appendChild(lista);
+
+      const fechaInput = document.createElement('input');
+      fechaInput.type = 'date';
+      fechaInput.placeholder = 'Fecha';
+
+      const motivoInput = document.createElement('textarea');
+      motivoInput.placeholder = 'Motivo';
+
+      const btnFalta = document.createElement('button');
+      btnFalta.innerText = 'Agregar Falta';
+      btnFalta.onclick = () => agregarRegistro(i, fechaInput.value, motivoInput.value, 'Falta');
+
+      const btnRetardo = document.createElement('button');
+      btnRetardo.innerText = 'Agregar Retardo';
+      btnRetardo.onclick = () => agregarRegistro(i, fechaInput.value, motivoInput.value, 'Retardo');
+
+      div.appendChild(fechaInput);
+      div.appendChild(motivoInput);
+      div.appendChild(btnFalta);
+      div.appendChild(btnRetardo);
+
+      contenedor.appendChild(div);
+
+      cargarDesdeStorage(i);
+    });
+
+    function agregarRegistro(index, fecha, motivo, tipo) {
+      if (!fecha || !motivo) return alert('Por favor completa la fecha y el motivo');
+      const lista = document.getElementById(`lista-${index}`);
+      const li = document.createElement('li');
+      li.innerText = `${tipo}: ${fecha} - ${motivo}`;
+      lista.appendChild(li);
+
+      guardarEnStorage(index);
+    }
+
+    function guardarEnStorage(index) {
+      const lista = document.getElementById(`lista-${index}`);
+      const items = [];
+      let faltas = 0;
+      let retardos = 0;
+      lista.querySelectorAll('li').forEach(li => {
+        items.push(li.innerText);
+        if (li.innerText.startsWith('Falta')) faltas++;
+        if (li.innerText.startsWith('Retardo')) retardos++;
+      });
+      localStorage.setItem(`materia-${index}`, JSON.stringify(items));
+      const contador = document.getElementById(`contador-${index}`);
+      contador.innerText = `Total: ${faltas} faltas, ${retardos} retardos`;
+    }
+
+    function cargarDesdeStorage(index) {
+      const lista = document.getElementById(`lista-${index}`);
+      const data = JSON.parse(localStorage.getItem(`materia-${index}`) || '[]');
+      data.forEach(texto => {
+        const li = document.createElement('li');
+        li.innerText = texto;
+        lista.appendChild(li);
+      });
+      guardarEnStorage(index);
+    }
+  </script>
+</body>
+</html>
